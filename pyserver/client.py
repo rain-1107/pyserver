@@ -41,14 +41,22 @@ class Client:
     def send_loop(self):
         while self.connected:
             loop_time = time.time()
-            self.send_server()
+            try:
+                self.send_server()
+            except (ConnectionResetError, socket.SO_ERROR):
+                self.connected = False
+                break
             dt = time.time() - loop_time
             if (1/self.tick_rate) - dt > 0:
                 time.sleep((1 / self.tick_rate) - dt)
 
     def recv_loop(self):
         while self.connected:
-            self.recv_server()
+            try:
+                self.recv_server()
+            except (ConnectionResetError, ConnectionAbortedError):
+                self.close()
+                break
 
     def send_server(self):
         for packet in self.packets:
@@ -57,11 +65,27 @@ class Client:
 
     def recv_server(self):
         data = self.socket_in.recv(BUFFER_SIZE)
+        if data == b'':
+            self.close()
+            return
         for func in self.__listeners:
-            func(data)
+            try:
+                func(data)
+            except:
+                self.log.log(f"Error occurred in event handler: {func}")
 
     def send(self, data):
         self.packets.append(data)
+
+    def close(self):
+        if not self.connected:
+            return
+        self.log.log("Closing connection...")
+        self.connected = False
+        self.socket_in.close()
+        self.socket_out.close()
+        self.log.log("Connection closed")
+        self.log.close()
 
     @property
     def on_receive(self):

@@ -1,5 +1,5 @@
 import pyserver
-import time
+
 client = pyserver.client.Client("localhost")
 
 

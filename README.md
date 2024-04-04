@@ -2,7 +2,7 @@
 pyserver is a python socket-based multi-threaded server package designed for simple server systems with event based handling calls.
 ---
 # Documentation
-# [client.py](pyserver/client.py)
+# [client.py](/pyserver/client.py)
 
 ## class Client(ip: str, output_to_console: bool = False)
 ### *Functions*

@@ -2,7 +2,7 @@
 pyserver is a python socket-based multi-threaded server package designed for simple server systems with event based handling calls.
 ---
 # Documentation
-# [client.py](/pyserver/client.py)
+# [client.py](pyserver/client.py)
 
 ## class Client(ip: str, output_to_console: bool = False)
 ### *Functions*
@@ -54,7 +54,7 @@ def handle(client: ServerClient, data: bytes):
 ```
 
 ## class ServerClient(parent: Server, sock_from, sock_to, addr)
-- ServerClient objects should not be created but will be given as a parameter in server event call
+- ServerClient objects should not be created but will be given as a parameter in [server event call](README.md#on_receive-1)
 #### def send(data: bytes)
 - Queues `data` to be sent to client as a packet
 > If `data` is not a bytes object it will not be sent

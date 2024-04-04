@@ -2,7 +2,7 @@
 pyserver is a python socket-based multi-threaded server package designed for simple server systems with event based handling calls.
 ---
 # Documentation
-# [client.py]()
+# [client.py](pyserver/client.py)
 
 ## class Client(ip: str, output_to_console: bool = False)
 ### *Functions*
@@ -30,9 +30,7 @@ def handle(data: bytes):
 	# Handler code here
 ```
 
-
----
-# [server.py]()
+# [server.py](pyserver/server.py)
 ## class Server(output_to_console: bool = False)
 #### def run()
 - Starts listening for connections and handles incoming connections
@@ -65,3 +63,6 @@ def handle(client: ServerClient, data: bytes):
  #### def close()
  - Will disconnect the client from the server and remove all references of the client
  > returns `None`
+# [log.py](pyserver/log.py)
+- Utility file for logging console to file
+

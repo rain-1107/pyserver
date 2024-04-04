@@ -1,4 +1,5 @@
 import pyserver
+import time
 
 client = pyserver.client.Client("localhost")
 
@@ -13,3 +14,4 @@ client.run()
 while client.connected:
     text = input("Input: ")
     client.send(text.encode("utf-8"))
+    time.sleep(1)

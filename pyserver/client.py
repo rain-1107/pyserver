@@ -37,6 +37,7 @@ class Client:
         self.recv_loop_thread = threading.Thread(target=self.recv_loop)
         self.recv_loop_thread.start()
         self.log.log("Done.")
+        return 0
 
     def send_loop(self):
         while self.connected:
@@ -74,7 +75,7 @@ class Client:
             except:
                 self.log.log(f"Error occurred in event handler: {func}")
 
-    def send(self, data):
+    def send(self, data: bytes):
         self.packets.append(data)
 
     def close(self):

@@ -5,7 +5,7 @@ from .constants import *
 from .textlog import Log
 
 
-class ClientObject:
+class ServerClient:
     def __init__(self, parent, sock_from, sock_to, addr):
         self.server = parent
         self.addr = addr
@@ -48,7 +48,7 @@ class ClientObject:
         if self in self.server.clients:
             self.socket_from.close()
             self.socket_to.close()
-            self.server.log.log(f"{self.addr} disconnected")
+            self.server.log.log(f"Connection from {self.addr[0]} closed.")
             self.server.clients.remove(self)
 
     def send(self, data):
@@ -56,14 +56,14 @@ class ClientObject:
 
 
 class Server:
-    def __init__(self):
+    def __init__(self, output_to_console=False):
         self.running = True
         self.runtime = time.time()
         self.clients = []
         self.threads = []
         self.__listeners = []
         self.tick_rate = DEFAULT_TICK_RATE
-        self.log = Log(True, "pyserver/log/serverlog.txt")
+        self.log = Log(output_to_console, "pyserver/log/serverlog.txt")
 
         self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,7 +71,7 @@ class Server:
         self.log.log("Binding sockets to ports...")
         self.socket_in.bind((host, PORT_C_TO_S))
         self.socket_out.bind((host, PORT_S_TO_C))
-        self.log.log("Done")
+        self.log.log("Done.")
 
     def run(self):
         self.log.log(f"Listening to connections...")
@@ -81,15 +81,15 @@ class Server:
             while self.running:
                 client_from, addr_from = self.socket_in.accept()
                 client_to, addr_to = self.socket_out.accept()
-                self.log.log(f"Handling connection from {addr_from}")
+                self.log.log(f"Handling connection from {addr_from[0]}.")
                 if addr_from[0] == addr_to[0]:
-                    client = ClientObject(self, sock_from=client_from, sock_to=client_to, addr=addr_to)
+                    client = ServerClient(self, sock_from=client_from, sock_to=client_to, addr=addr_to)
                     self.clients.append(client)
                     client.run()
         except OSError:
-            self.log.log("Sockets closed")
+            self.log.log("Sockets closed.")
 
-    def client_send(self, client: ClientObject):
+    def client_send(self, client: ServerClient):
         try:
             for packet in client.packets:
                 client.socket_to.send(packet)
@@ -98,7 +98,7 @@ class Server:
             client.close()
             return
 
-    def client_receive(self, client: ClientObject):
+    def client_receive(self, client: ServerClient):
         try:
             data = client.socket_from.recv(BUFFER_SIZE)
         except OSError:
@@ -124,7 +124,7 @@ class Server:
             client.close()
         self.socket_in.close()
         self.socket_out.close()
-        self.log.log("Server closed")
+        self.log.log("Server closed.")
         self.log.close()
 
     @property

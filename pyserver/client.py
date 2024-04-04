@@ -6,7 +6,7 @@ from .constants import *
 
 
 class Client:
-    def __init__(self, ip):
+    def __init__(self, ip, output_to_console=False):
         self.ip = ip
         if self.ip == "" or self.ip == "localhost":
             self.ip = socket.gethostname()
@@ -14,7 +14,7 @@ class Client:
         self.__listeners = []
         self.packets = []
         self.tick_rate = DEFAULT_TICK_RATE
-        self.log = Log(True, "pyserver/log/clientlog.txt")
+        self.log = Log(output_to_console, "pyserver/log/clientlog.txt")
         self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.send_loop_thread = None
@@ -29,14 +29,14 @@ class Client:
         except ConnectionRefusedError:
             self.log.log("Error: Connection refused")
             return 1
-        self.log.log("Connected to server")
+        self.log.log("Connected to server.")
         self.connected = True
-        self.log.log("Initialising handling threads")
+        self.log.log("Initialising handling threads...")
         self.send_loop_thread = threading.Thread(target=self.send_loop)
         self.send_loop_thread.start()
         self.recv_loop_thread = threading.Thread(target=self.recv_loop)
         self.recv_loop_thread.start()
-        self.log.log("Done")
+        self.log.log("Done.")
 
     def send_loop(self):
         while self.connected:
@@ -84,7 +84,7 @@ class Client:
         self.connected = False
         self.socket_in.close()
         self.socket_out.close()
-        self.log.log("Connection closed")
+        self.log.log("Connection closed.")
         self.log.close()
 
     @property

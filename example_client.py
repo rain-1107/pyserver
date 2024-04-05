@@ -9,9 +9,12 @@ def handle(data):
     print(data.decode("utf-8"))
 
 
-client.run()
+client.connect()
 
 while client.connected:
     text = input("Input: ")
-    client.send(text.encode("utf-8"))
-    time.sleep(1)
+    if text == "exit":
+        client.close()
+    else:
+        client.send(text.encode("utf-8"))
+        time.sleep(1)

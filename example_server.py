@@ -1,6 +1,6 @@
 import pyserver
 
-server = pyserver.server.Server()
+server = pyserver.server.Server(True)
 
 
 @server.on_receive

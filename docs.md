@@ -3,7 +3,7 @@
 
 ## class Client(ip: str, output_to_console: bool = False)
 ### *Functions*
-#### def run()
+#### def connect()
 - Attempts connection with server at IP specified in constructor
 - This function is non-blocking
 > returns ``0`` if connection is successful

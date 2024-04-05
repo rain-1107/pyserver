@@ -21,7 +21,7 @@ class Client:
         self.recv_loop_thread = None
         self.connected = False
 
-    def run(self):
+    def connect(self):
         self.log.log("Connecting to server...")
         try:
             self.socket_in.connect((self.ip, PORT_S_TO_C))

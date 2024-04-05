@@ -45,11 +45,14 @@ class ServerClient:
                 break
 
     def close(self):
+        if not self.connected:
+            return
+        self.connected = False
         if self in self.server.clients:
+            self.server.clients.remove(self)
             self.socket_from.close()
             self.socket_to.close()
             self.server.log.log(f"Connection from {self.addr[0]} closed.")
-            self.server.clients.remove(self)
 
     def send(self, data):
         self.packets.append(data)
@@ -74,6 +77,7 @@ class Server:
         self.log.log("Done.")
 
     def run(self):
+        threading.Thread(target=self.input_check).start()
         self.log.log(f"Listening to connections...")
         try:
             self.socket_in.listen()
@@ -120,12 +124,18 @@ class Server:
     def close(self):
         self.running = False
         for client in self.clients.copy():
-            client.connected = False
             client.close()
         self.socket_in.close()
         self.socket_out.close()
         self.log.log("Server closed.")
         self.log.close()
+
+    def input_check(self):
+        while self.running:
+            string = input("")
+            if string.lower() == "exit":
+                self.close()
+                break
 
     @property
     def on_receive(self):

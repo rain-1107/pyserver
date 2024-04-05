@@ -41,7 +41,7 @@ def handle(data: bytes):
 > If `data` is not a bytes object it will not be sent
 > 
 > returns `None`
-#### def get_clients(d)
+#### def get_clients()
 - Returns a copy of the `clients` array
 > returns `None`
  #### def close()

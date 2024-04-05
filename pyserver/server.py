@@ -121,6 +121,9 @@ class Server:
         for client in self.clients:
             client.send(data)
 
+    def get_clients(self):
+        return self.clients.copy()
+
     def close(self):
         self.running = False
         for client in self.clients.copy():

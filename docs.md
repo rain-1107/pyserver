@@ -2,7 +2,6 @@
 # [client.py](pyserver/client.py)
 
 ## class Client(ip: str, output_to_console: bool = False)
-### *Functions*
 #### def connect()
 - Attempts connection with server at IP specified in constructor
 - This function is non-blocking
@@ -29,6 +28,10 @@ def handle(data: bytes):
 
 # [server.py](pyserver/server.py)
 ## class Server(output_to_console: bool = False)
+### *Attributes*
+#### clients
+- `clients` is an array of `ServerClient` objects that are currently connected
+### *Functions*
 #### def run()
 - Starts listening for connections and handles incoming connections
 - This function is blocking
@@ -37,6 +40,9 @@ def handle(data: bytes):
 - Queues `data` to be sent to all clients
 > If `data` is not a bytes object it will not be sent
 > 
+> returns `None`
+#### def get_clients(d)
+- Returns a copy of the `clients` array
 > returns `None`
  #### def close()
  - Disconnects all clients and closes the server
@@ -49,7 +55,6 @@ def handle(data: bytes):
 def handle(client: ServerClient, data: bytes):
 	# Handler code here
 ```
-
 ## class ServerClient(parent: Server, sock_from, sock_to, addr)
 - ServerClient objects should not be created but will be given as a parameter in [server event call](README.md#on_receive-1)
 #### def send(data: bytes)

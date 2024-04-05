@@ -1,7 +1,7 @@
-import pyserver
+import pythreadserver
 import time
 
-client = pyserver.client.Client("localhost")
+client = pythreadserver.client.Client("localhost")
 
 
 @client.on_receive

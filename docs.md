@@ -1,5 +1,5 @@
 # Documentation
-# [client.py](pyserver/client.py)
+# [client.py](pythreadserver/client.py)
 
 ## class Client(ip: str, output_to_console: bool = False)
 #### def connect()
@@ -26,7 +26,7 @@ def handle(data: bytes):
 	# Handler code here
 ```
 
-# [server.py](pyserver/server.py)
+# [server.py](pythreadserver/server.py)
 ## class Server(output_to_console: bool = False)
 ### *Attributes*
 #### clients
@@ -65,7 +65,7 @@ def handle(client: ServerClient, data: bytes):
  #### def close()
  - Will disconnect the client from the server and remove all references of the client
  > returns `None`
-# [textlog.py](pyserver/textlog.py)
+# [textlog.py](pythreadserver/textlog.py)
 - Utility file for logging console to file
 ## class Log(write_to_console: bool, filename: str)
 #### def log(text: str)
@@ -77,7 +77,7 @@ def handle(client: ServerClient, data: bytes):
 > This clears the log but each call writes over contents of the file
 >
 > returns `None`
-# [constants.py](pyserver/constants.py)
+# [constants.py](pythreadserver/constants.py)
 - This file only holds constants that are used within the package classes
 
 |name|description  |

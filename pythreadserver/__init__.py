@@ -1,2 +1,2 @@
-import pyserver.server
-import pyserver.client
+import pythreadserver.server
+import pythreadserver.client

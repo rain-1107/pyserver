@@ -1,7 +1,13 @@
 # Documentation
 # [client.py](pythreadserver/client.py)
 
-## class Client(ip: str, output_to_console: bool = False)
+## class Client(ip: str, **kwargs)
+### *Parameters*
+```py
+console: bool = True  # If true will output log messages to console
+log_path: str = ""  # Path to save log text file. Leave empty for no saving.
+```
+### *Functions*
 #### def connect()
 - Attempts connection with server at IP specified in constructor
 - This function is non-blocking
@@ -28,6 +34,11 @@ def handle(data: bytes):
 
 # [server.py](pythreadserver/server.py)
 ## class Server(output_to_console: bool = False)
+### *Parameters*
+```py
+console: bool = True  # If true will output log messages to console
+log_path: str = ""  # Path to save log text file. Leave empty for no saving.
+```
 ### *Attributes*
 #### clients
 - `clients` is an array of `ServerClient` objects that are currently connected
@@ -85,4 +96,3 @@ def handle(client: ServerClient, data: bytes):
 |BUFFER_SIZE | Max number of bytes received each tick  |
 | PORT_C_TO_S | Default port for network path from client to server |
 | PORT_S_TO_C | Default port for network path from server to client |
-| DEFAULT_TICK_RATE | Default number of ticks per second (Hz) |

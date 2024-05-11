@@ -1,6 +1,6 @@
 import pythreadserver
 
-server = pythreadserver.server.Server(True)
+server = pythreadserver.server.Server()
 
 
 @server.on_receive

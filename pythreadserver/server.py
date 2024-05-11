@@ -24,16 +24,12 @@ class ServerClient:
 
     def send_loop(self,):
         while self.connected:
-            init = time.time()
             try:
                 self.server.client_send(self)
             except ConnectionResetError:
                 self.connected = False
                 self.close()
                 break
-            dt = time.time() - init
-            if (1/self.server.tick_rate) - dt > 0:
-                time.sleep((1/self.server.tick_rate) - dt)
 
     def recv_loop(self):
         while self.connected:
@@ -59,14 +55,20 @@ class ServerClient:
 
 
 class Server:
-    def __init__(self, output_to_console=False):
+    def __init__(self, **kwargs):
+        output_to_console = True
+        log_path = ""
+        if "console" in kwargs:
+            output_to_console = kwargs["console"]
+        if "log_path" in kwargs:
+            log_path = kwargs["log_path"]
+
         self.running = True
         self.runtime = time.time()
         self.clients = []
         self.threads = []
         self.__listeners = []
-        self.tick_rate = DEFAULT_TICK_RATE
-        self.log = Log(output_to_console, "pyserver/log/serverlog.txt")
+        self.log = Log(output_to_console, log_path)
 
         self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

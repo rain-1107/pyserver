@@ -6,20 +6,27 @@ from .constants import *
 
 
 class Client:
-    def __init__(self, ip, output_to_console=False):
+    def __init__(self, ip, **kwargs):
+        output_to_console = True
+        log_path = ""
+        if "console" in kwargs:
+            output_to_console = kwargs["console"]
+        if "log_path" in kwargs:
+            log_path = kwargs["log_path"]
+
         self.ip = ip
         if self.ip == "" or self.ip == "localhost":
             self.ip = socket.gethostname()
-        self.runtime = time.time()
         self.__listeners = []
         self.packets = []
-        self.tick_rate = DEFAULT_TICK_RATE
-        self.log = Log(output_to_console, "pyserver/log/clientlog.txt")
+        self.log = Log(output_to_console, log_path)
         self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.send_loop_thread = None
         self.recv_loop_thread = None
         self.connected = False
+
+        self.runtime = time.time()
 
     def connect(self):
         self.log.log("Connecting to server...")
@@ -41,15 +48,11 @@ class Client:
 
     def send_loop(self):
         while self.connected:
-            loop_time = time.time()
             try:
                 self.send_server()
             except (ConnectionResetError, socket.SO_ERROR):
                 self.connected = False
                 break
-            dt = time.time() - loop_time
-            if (1/self.tick_rate) - dt > 0:
-                time.sleep((1 / self.tick_rate) - dt)
 
     def recv_loop(self):
         while self.connected:

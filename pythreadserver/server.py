@@ -22,7 +22,7 @@ class ServerClient:
         self.recv_loop_thread = threading.Thread(target=self.recv_loop)
         self.recv_loop_thread.start()
 
-    def send_loop(self,):
+    def send_loop(self):
         while self.connected:
             try:
                 self.server.client_send(self)

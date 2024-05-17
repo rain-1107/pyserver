@@ -1,15 +1,15 @@
 # Documentation
 # [client.py](pythreadserver/client.py)
 
-## class Client(ip: str, **kwargs)
+## class Client(**kwargs)
 ### *Parameters*
 ```py
 console: bool = True  # If true will output log messages to console
 log_path: str = ""  # Path to save log text file. Leave empty for no saving.
 ```
 ### *Functions*
-#### def connect()
-- Attempts connection with server at IP specified in constructor
+#### def connect(ip: str)
+- Attempts connection with server at IP passed in function
 - This function is non-blocking
 > returns ``0`` if connection is successful
 > 
@@ -21,7 +21,7 @@ log_path: str = ""  # Path to save log text file. Leave empty for no saving.
 > returns `None`
 #### def close()
 - Closes connection with server and closes connection
-- Log is outputted to `pyserver/log/clientlog.txt`
+- Log is outputted to `log_path`
 > returns `None`
 
 #### @on_receive
@@ -57,7 +57,7 @@ log_path: str = ""  # Path to save log text file. Leave empty for no saving.
 > returns `None`
  #### def close()
  - Disconnects all clients and closes the server
- - Log is outputted to `pyserver/log/serverlog.txt`
+ - Log is outputted to `log_path`
  > returns `None`
  #### @on_receive
 - Decorator to signal function to be event handler for when the server receives data from a client

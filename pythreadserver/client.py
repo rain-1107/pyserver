@@ -6,7 +6,7 @@ from .constants import *
 
 
 class Client:
-    def __init__(self, ip, **kwargs):
+    def __init__(self, **kwargs):
         output_to_console = True
         log_path = ""
         if "console" in kwargs:
@@ -14,9 +14,6 @@ class Client:
         if "log_path" in kwargs:
             log_path = kwargs["log_path"]
 
-        self.ip = ip
-        if self.ip == "" or self.ip == "localhost":
-            self.ip = socket.gethostname()
         self.__listeners = []
         self.packets = []
         self.log = Log(output_to_console, log_path)
@@ -28,11 +25,13 @@ class Client:
 
         self.runtime = time.time()
 
-    def connect(self):
+    def connect(self, ip):
+        if ip == "localhost":
+            ip = socket.gethostname()
         self.log.log("Connecting to server...")
         try:
-            self.socket_in.connect((self.ip, PORT_S_TO_C))
-            self.socket_out.connect((self.ip, PORT_C_TO_S))
+            self.socket_in.connect((ip, PORT_S_TO_C))
+            self.socket_out.connect((ip, PORT_C_TO_S))
         except ConnectionRefusedError:
             self.log.log("Error: Connection refused")
             return 1

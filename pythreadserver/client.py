@@ -14,7 +14,9 @@ class Client:
         if "log_path" in kwargs:
             log_path = kwargs["log_path"]
 
-        self.__listeners = []
+        self.__recv_listeners = []
+        self.__connection_listeners = []
+        self.__disconnect_listeners = []
         self.packets = []
         self.log = Log(output_to_console, log_path)
         self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,7 +51,7 @@ class Client:
         while self.connected:
             try:
                 self.send_server()
-            except (ConnectionResetError, socket.SO_ERROR):
+            except (ConnectionResetError, ConnectionAbortedError):
                 self.connected = False
                 break
 
@@ -71,7 +73,7 @@ class Client:
         if data == b'':
             self.close()
             return
-        for func in self.__listeners:
+        for func in self.__recv_listeners:
             try:
                 func(data)
             except:
@@ -93,16 +95,39 @@ class Client:
     @property
     def on_receive(self):
         def wrapper(func):
-            self.add_listener(func)
+            if func not in self.__recv_listeners:
+                self.__recv_listeners.append(func)
             return func
         return wrapper
 
-    def add_listener(self, func):
-        if func in self.__listeners:
+    def remove_recv_listener(self, func):
+        if func not in self.__recv_listeners:
             return
-        self.__listeners.append(func)
+        self.__connection_listeners.remove(func)
 
-    def remove_listener(self, func):
-        if func not in self.__listeners:
+    @property
+    def on_connect(self):
+        def wrapper(func):
+            if func not in self.__connection_listeners:
+                self.__connection_listeners.append(func)
+            return func
+        return wrapper
+ 
+    def remove_connection_listener(self, func):
+        if func not in self.__connection_listeners:
             return
-        self.__listeners.remove(func)
+        self.__connection_listeners.remove(func)
+    
+    @property
+    def on_disconnect(self):
+        def wrapper(func):
+            if func not in self.__disconnect_listeners:
+                self.__disconnect_listeners.append(func)
+            return func
+        return wrapper
+ 
+    def remove_disconnection_listener(self, func):
+        if func not in self.__disconnect_listeners:
+            return
+        self.__disconnect_listeners.remove(func)
+  

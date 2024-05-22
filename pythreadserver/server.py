@@ -67,7 +67,9 @@ class Server:
         self.runtime = time.time()
         self.clients = []
         self.threads = []
-        self.__listeners = []
+        self.__recv_listeners = []
+        self.__connection_listeners = []
+        self.__disconnect_listeners = []
         self.log = Log(output_to_console, log_path)
 
         self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -113,7 +115,7 @@ class Server:
         if data == b'':
             client.close()
             return
-        for func in self.__listeners:
+        for func in self.__recv_listeners:
             try:
                 func(client, data)
             except:
@@ -145,16 +147,38 @@ class Server:
     @property
     def on_receive(self):
         def wrapper(func):
-            self.add_listener(func)
+            if func not in self.__recv_listeners:
+                self.__recv_listeners.append(func)
             return func
         return wrapper
 
-    def add_listener(self, func):
-        if func in self.__listeners:
+    def remove_recv_listener(self, func):
+        if func not in self.__recv_listeners:
             return
-        self.__listeners.append(func)
+        self.__recv_listeners.remove(func)
 
-    def remove_listener(self, func):
-        if func not in self.__listeners:
+    @property
+    def on_connection(self):
+        def wrapper(func):
+            if func not in self.__connection_listeners:
+                self.__connection_listeners.append(func)
+            return func
+        return wrapper
+
+    def remove_connection_listener(self, func):
+        if func not in self.__connection_listeners:
             return
-        self.__listeners.remove(func)
+        self.__connection_listeners.remove(func)
+
+    @property
+    def on_disconnect(self):
+        def wrapper(func):
+            if func not in self.__disconnect_listeners:
+                self.__connection_listeners.append(func)
+            return func
+        return wrapper
+
+    def remove_disconnect_listener(self, func):
+        if func not in self.__disconnect_listeners:
+            return
+        self.__disconnect_listeners.remove(func)

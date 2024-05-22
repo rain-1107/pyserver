@@ -15,5 +15,5 @@ class Log:
             file.write(self.text)
             file.close()
         except OSError:
-            self.log("Error saving log file")
+            self.log("Log not saved")
         self.text = ""

@@ -49,6 +49,12 @@ class ServerClient:
             self.socket_from.close()
             self.socket_to.close()
             self.server.log.log(f"Connection from {self.addr[0]} closed.")
+        for func in self.server._disconnect_listeners:
+            try:
+                func(self)
+            except:
+                self.server.log.log(f"Error occurred during event handler: {func}")
+
 
     def send(self, data):
         self.packets.append(data)
@@ -67,9 +73,9 @@ class Server:
         self.runtime = time.time()
         self.clients = []
         self.threads = []
-        self.__recv_listeners = []
-        self.__connection_listeners = []
-        self.__disconnect_listeners = []
+        self._recv_listeners = []
+        self._connection_listeners = []
+        self._disconnect_listeners = []
         self.log = Log(output_to_console, log_path)
 
         self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -93,6 +99,11 @@ class Server:
                 if addr_from[0] == addr_to[0]:
                     client = ServerClient(self, sock_from=client_from, sock_to=client_to, addr=addr_to)
                     self.clients.append(client)
+                    for func in self._connection_listeners:
+                        try:
+                            func(client)
+                        except: 
+                            self.log.log(f"Error occured in event handler: {func}")
                     client.run()
         except OSError:
             self.log.log("Sockets closed.")
@@ -115,7 +126,7 @@ class Server:
         if data == b'':
             client.close()
             return
-        for func in self.__recv_listeners:
+        for func in self._recv_listeners:
             try:
                 func(client, data)
             except:
@@ -147,38 +158,38 @@ class Server:
     @property
     def on_receive(self):
         def wrapper(func):
-            if func not in self.__recv_listeners:
-                self.__recv_listeners.append(func)
+            if func not in self._recv_listeners:
+                self._recv_listeners.append(func)
             return func
         return wrapper
 
     def remove_recv_listener(self, func):
-        if func not in self.__recv_listeners:
+        if func not in self._recv_listeners:
             return
-        self.__recv_listeners.remove(func)
+        self._recv_listeners.remove(func)
 
     @property
     def on_connection(self):
         def wrapper(func):
-            if func not in self.__connection_listeners:
-                self.__connection_listeners.append(func)
+            if func not in self._connection_listeners:
+                self._connection_listeners.append(func)
             return func
         return wrapper
 
     def remove_connection_listener(self, func):
-        if func not in self.__connection_listeners:
+        if func not in self._connection_listeners:
             return
-        self.__connection_listeners.remove(func)
+        self._connection_listeners.remove(func)
 
     @property
     def on_disconnect(self):
         def wrapper(func):
-            if func not in self.__disconnect_listeners:
-                self.__connection_listeners.append(func)
+            if func not in self._disconnect_listeners:
+                self._connection_listeners.append(func)
             return func
         return wrapper
 
     def remove_disconnect_listener(self, func):
-        if func not in self.__disconnect_listeners:
+        if func not in self._disconnect_listeners:
             return
-        self.__disconnect_listeners.remove(func)
+        self._disconnect_listeners.remove(func)

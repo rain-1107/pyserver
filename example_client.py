@@ -1,7 +1,7 @@
 import pythreadserver
 import time
 
-client = pythreadserver.client.Client("localhost")
+client = pythreadserver.client.Client()
 
 
 @client.on_receive
@@ -9,7 +9,7 @@ def handle(data):
     print(data.decode("utf-8"))
 
 
-client.connect()
+client.connect("localhost")
 
 while client.connected:
     text = input("Input: ")

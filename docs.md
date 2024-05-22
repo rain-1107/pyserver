@@ -31,7 +31,20 @@ log_path: str = ""  # Path to save log text file. Leave empty for no saving.
 def handle(data: bytes):
 	# Handler code here
 ```
-
+#### @on_connect
+- Decorator to handle a valid connection to the server
+```py
+@client.on_connect
+def handle():
+	# Handler code here
+```
+#### @on_disconnect
+- Decorator to handle disonncetion event from server
+```py
+@client.on_disonnect
+def handle():
+	# Handler code here
+````
 # [server.py](pythreadserver/server.py)
 ## class Server(output_to_console: bool = False)
 ### *Parameters*
@@ -59,15 +72,32 @@ log_path: str = ""  # Path to save log text file. Leave empty for no saving.
  - Disconnects all clients and closes the server
  - Log is outputted to `log_path`
  > returns `None`
- #### @on_receive
+#### @on_receive
 - Decorator to signal function to be event handler for when the server receives data from a client
 ```py
 @server.on_receive
 def handle(client: ServerClient, data: bytes):
 	# Handler code here
 ```
+#### @on_connection
+- Decorator to handle event of connection from a new client
+```py
+@server.on_receive
+def handle(client: ServerClient):
+	# Handler code here
+```
+#### @on_disconnect
+- Decorator to handle event of connection closing with a client
+```py
+@server.on_receive
+def handle(client: ServerClient):
+	# Handler code here
+```
+> Note that the `ServerClient` object here is 
+> no longer connected to the server and can not be sent data
 ## class ServerClient(parent: Server, sock_from, sock_to, addr)
-- ServerClient objects should not be created but will be given as a parameter in [server event call](README.md#on_receive-1)
+- ServerClient objects should not be created but will be given as a 
+    parameter in `@on_receive`, `@on_connection`, `@on_disconnect`
 #### def send(data: bytes)
 - Queues `data` to be sent to client as a packet
 > If `data` is not a bytes object it will not be sent

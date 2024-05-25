@@ -1,20 +1,24 @@
-import pythreadserver
+from pythreadserver import client
 import time
 
-client = pythreadserver.client.Client()
+c= client.Client()
 
 
-@client.on_receive
+@c.on_receive
 def handle(data):
     print(data.decode("utf-8"))
 
 
-client.connect("localhost")
+@c.on_disconnect
+def handle_disc():
+    c.connect("localhost")
 
-while client.connected:
+c.connect("localhost")
+
+while c.connected:
     text = input("Input: ")
     if text == "exit":
-        client.close()
+        c.close()
     else:
-        client.send(text.encode("utf-8"))
+        c.send(text.encode("utf-8"))
         time.sleep(1)

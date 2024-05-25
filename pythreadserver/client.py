@@ -30,12 +30,18 @@ class Client:
         if ip == "localhost":
             ip = socket.gethostname()
         self.log.log("Connecting to server...")
-        try:
-            self.socket_in.connect((ip, PORT_S_TO_C))
-            self.socket_out.connect((ip, PORT_C_TO_S))
-        except ConnectionRefusedError:
-            self.log.log("Error: Connection refused")
-            return 1
+        while True:
+            try:
+                self.socket_in.connect((ip, PORT_S_TO_C))
+                self.socket_out.connect((ip, PORT_C_TO_S))
+                break
+            except ConnectionRefusedError:
+                self.log.log("Error: Connection refused")
+                return 1
+            except OSError:
+                self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         self.log.log("Connected to server.")
         self.connected = True
         self.log.log("Initialising handling threads...")
@@ -47,41 +53,35 @@ class Client:
         for func in self._connection_listeners:
             try:
                 func()
-            except:
-                self.log.log(f"Error occurred in event handler: {func}")
+            except Exception as err:
+                self.log.log(f"{err}\nError occurred in event handler: {func}")
         return 0
 
     def send_loop(self):
         while self.connected:
             try:
-                self.send_server()
+                for packet in self.packets:
+                    self.socket_out.send(packet)
+                    self.packets = []
             except (ConnectionResetError, ConnectionAbortedError):
-                self.connected = False
+                self.close()
                 break
 
     def recv_loop(self):
         while self.connected:
             try:
-                self.recv_server()
+                data = self.socket_in.recv(BUFFER_SIZE)
+                if data == b'':
+                    self.close()
+                    return
+                for func in self._recv_listeners:
+                    try:
+                        func(data)
+                    except Exception as err:
+                        self.log.log(f"{err}\nError occurred in event handler: {func}")
             except (ConnectionResetError, ConnectionAbortedError):
                 self.close()
                 break
-
-    def send_server(self):
-        for packet in self.packets:
-            self.socket_out.send(packet)
-        self.packets = []
-
-    def recv_server(self):
-        data = self.socket_in.recv(BUFFER_SIZE)
-        if data == b'':
-            self.close()
-            return
-        for func in self._recv_listeners:
-            try:
-                func(data)
-            except:
-                self.log.log(f"Error occurred in event handler: {func}")
 
     def send(self, data: bytes):
         self.packets.append(data)
@@ -97,8 +97,8 @@ class Client:
         for func in self._disconnect_listeners:
             try:
                 func()
-            except:
-                self.log.log(f"Error occurred in event handler: {func}")
+            except Exception as err:
+                self.log.log(f"{err}\nError occurred in event handler: {func}")
         self.log.close()
 
 

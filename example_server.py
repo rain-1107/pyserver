@@ -1,14 +1,15 @@
-import pythreadserver
-
-server = pythreadserver.server.Server()
-
-@server.on_connection
-def connection(client):
-    print("Hello",client)
-
-@server.on_receive
-def handle(client, data):
-    server.sendall(data)
+from pythreadserver import server
+s = server.Server()
 
 
-server.run()
+@s.on_connection
+def connection(client: server.ServerClient):
+    print("Hello",client.addr)
+
+
+@s.on_receive
+def handle(client: server.ServerClient, data: bytes):
+    s.sendall(data)
+
+
+s.run()

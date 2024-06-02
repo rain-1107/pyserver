@@ -6,11 +6,10 @@ from .textlog import Log
 
 
 class ServerClient:
-    def __init__(self, parent, sock_from, sock_to, addr):
+    def __init__(self, parent, socket, addr):
         self.server = parent
         self.addr = addr
-        self.socket_to = sock_to
-        self.socket_from = sock_from
+        self.socket = socket
         self.connected = True
         self.packets = []
         self.send_loop_thread = None
@@ -46,8 +45,7 @@ class ServerClient:
         self.connected = False
         if self in self.server.clients:
             self.server.clients.remove(self)
-            self.socket_from.close()
-            self.socket_to.close()
+            self.socket.close()
             self.server.log.log(f"Connection from {self.addr[0]} closed.")
         for func in self.server._disconnect_listeners:
             try:
@@ -78,40 +76,35 @@ class Server:
         self._disconnect_listeners = []
         self.log = Log(output_to_console, log_path)
 
-        self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = ""
         self.log.log("Binding sockets to ports...")
-        self.socket_in.bind((host, PORT_C_TO_S))
-        self.socket_out.bind((host, PORT_S_TO_C))
+        self.socket.bind((host, PORT))
         self.log.log("Done.")
 
     def run(self):
         threading.Thread(target=self.input_check).start()
         self.log.log(f"Listening to connections...")
         try:
-            self.socket_in.listen()
-            self.socket_out.listen()
+            self.socket.listen()
             while self.running:
-                client_from, addr_from = self.socket_in.accept()
-                client_to, addr_to = self.socket_out.accept()
-                self.log.log(f"Handling connection from {addr_from[0]}.")
-                if addr_from[0] == addr_to[0]:
-                    client = ServerClient(self, sock_from=client_from, sock_to=client_to, addr=addr_to)
-                    self.clients.append(client)
-                    for func in self._connection_listeners:
-                        try:
-                            func(client)
-                        except: 
-                            self.log.log(f"Error occured in event handler: {func}")
-                    client.run()
+                client, addr = self.socket.accept()
+                self.log.log(f"Handling connection from {addr[0]}.")
+                client = ServerClient(self, socket=client, addr=addr)
+                self.clients.append(client)
+                for func in self._connection_listeners:
+                    try:
+                        func(client)
+                    except: 
+                        self.log.log(f"Error occured in event handler: {func}")
+                client.run()
         except OSError:
             self.log.log("Sockets closed.")
 
     def client_send(self, client: ServerClient):
         try:
             for packet in client.packets:
-                client.socket_to.send(packet)
+                client.socket.send(packet)
             client.packets = []
         except OSError:
             client.close()
@@ -119,7 +112,7 @@ class Server:
 
     def client_receive(self, client: ServerClient):
         try:
-            data = client.socket_from.recv(BUFFER_SIZE)
+            data = client.socket.recv(BUFFER_SIZE)
         except OSError:
             client.close()
             return
@@ -143,8 +136,7 @@ class Server:
         self.running = False
         for client in self.clients.copy():
             client.close()
-        self.socket_in.close()
-        self.socket_out.close()
+        self.socket.close()
         self.log.log("Server closed.")
         self.log.close()
 

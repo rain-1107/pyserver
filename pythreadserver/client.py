@@ -19,8 +19,7 @@ class Client:
         self._disconnect_listeners = []
         self.packets = []
         self.log = Log(output_to_console, log_path)
-        self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.send_loop_thread = None
         self.recv_loop_thread = None
         self.connected = False
@@ -32,15 +31,13 @@ class Client:
         self.log.log("Connecting to server...")
         while True:
             try:
-                self.socket_in.connect((ip, PORT_S_TO_C))
-                self.socket_out.connect((ip, PORT_C_TO_S))
+                self.socket.connect((ip, PORT))
                 break
             except ConnectionRefusedError:
                 self.log.log("Error: Connection refused")
                 return 1
             except OSError:
-                self.socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.log.log("Connected to server.")
         self.connected = True
@@ -61,7 +58,7 @@ class Client:
         while self.connected:
             try:
                 for packet in self.packets:
-                    self.socket_out.send(packet)
+                    self.socket.send(packet)
                     self.packets = []
             except (ConnectionResetError, ConnectionAbortedError):
                 self.close()
@@ -70,7 +67,7 @@ class Client:
     def recv_loop(self):
         while self.connected:
             try:
-                data = self.socket_in.recv(BUFFER_SIZE)
+                data = self.socket.recv(BUFFER_SIZE)
                 if data == b'':
                     self.close()
                     return
@@ -91,8 +88,7 @@ class Client:
             return
         self.log.log("Closing connection...")
         self.connected = False
-        self.socket_in.close()
-        self.socket_out.close()
+        self.socket.close()
         self.log.log("Connection closed.")
         for func in self._disconnect_listeners:
             try:

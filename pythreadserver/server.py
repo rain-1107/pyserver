@@ -62,11 +62,13 @@ class Server:
     def __init__(self, **kwargs):
         output_to_console = True
         log_path = ""
+        self.port = PORT
         if "console" in kwargs:
             output_to_console = kwargs["console"]
         if "log_path" in kwargs:
             log_path = kwargs["log_path"]
-
+        if "port" in kwargs:
+            self.port = kwargs["port"]
         self.running = True
         self.runtime = time.time()
         self.clients = []
@@ -177,7 +179,7 @@ class Server:
     def on_disconnect(self):
         def wrapper(func):
             if func not in self._disconnect_listeners:
-                self._connection_listeners.append(func)
+                self._disconnect_listeners.append(func)
             return func
         return wrapper
 

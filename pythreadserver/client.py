@@ -13,7 +13,7 @@ class Client:
             output_to_console = kwargs["console"]
         if "log_path" in kwargs:
             log_path = kwargs["log_path"]
-
+        
         self._recv_listeners = []
         self._connection_listeners = []
         self._disconnect_listeners = []
@@ -25,13 +25,13 @@ class Client:
         self.connected = False
         self.runtime = time.time()
 
-    def connect(self, ip):
+    def connect(self, ip, port=PORT):
         if ip == "localhost":
             ip = socket.gethostname()
         self.log.log("Connecting to server...")
         while True:
             try:
-                self.socket.connect((ip, PORT))
+                self.socket.connect((ip, port))
                 break
             except ConnectionRefusedError:
                 self.log.log("Error: Connection refused")

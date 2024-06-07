@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.1.7'
+VERSION = '0.1.9'
 DESCRIPTION = 'Socket-based server package'
 LONG_DESCRIPTION = 'https://github.com/rain-1107/pythreadserver'
 

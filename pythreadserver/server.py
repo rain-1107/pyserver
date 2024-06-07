@@ -144,7 +144,11 @@ class Server:
 
     def input_check(self):
         while self.running:
-            string = input("")
+            try:
+                string = input("")
+            except KeyboardInterrupt:
+                self.close()
+                break
             if string.lower() == "exit":
                 self.close()
                 break

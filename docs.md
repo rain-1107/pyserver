@@ -10,7 +10,6 @@ log_path: str = ""  # Path to save log text file. Leave empty for no saving.
 ### *Functions*
 #### def connect(ip: str)
 - Attempts connection with server at IP passed in function
-- This function is non-blocking
 > returns ``0`` if connection is successful
 > 
 > returns ``1``if connection is refused
@@ -46,11 +45,12 @@ def handle():
 	# Handler code here
 ````
 # [server.py](pythreadserver/server.py)
-## class Server(output_to_console: bool = False)
+## class Server()
 ### *Parameters*
 ```py
 console: bool = True  # If true will output log messages to console
 log_path: str = ""  # Path to save log text file. Leave empty for no saving.
+port: int = constants.PORT # Port override (Default is 30000) 
 ```
 ### *Attributes*
 #### clients
@@ -58,7 +58,9 @@ log_path: str = ""  # Path to save log text file. Leave empty for no saving.
 ### *Functions*
 #### def run()
 - Starts listening for connections and handles incoming connections
-- This function is blocking
+- This function will not be left until the server closes.
+> Note: the server can be stopped manually by entering 'stop' or a keyboard interupt (CTRL + C)
+>
 > returns `None`
 #### def sendall(data: bytes)
 - Queues `data` to be sent to all clients
@@ -68,10 +70,10 @@ log_path: str = ""  # Path to save log text file. Leave empty for no saving.
 #### def get_clients()
 - Returns a copy of the `clients` array
 > returns `None`
- #### def close()
- - Disconnects all clients and closes the server
- - Log is outputted to `log_path`
- > returns `None`
+#### def close()
+- Disconnects all clients and closes the server
+- Log is outputted to `log_path`
+> returns `None`
 #### @on_receive
 - Decorator to signal function to be event handler for when the server receives data from a client
 ```py
@@ -82,14 +84,14 @@ def handle(client: ServerClient, data: bytes):
 #### @on_connection
 - Decorator to handle event of connection from a new client
 ```py
-@server.on_receive
+@server.on_connection
 def handle(client: ServerClient):
 	# Handler code here
 ```
 #### @on_disconnect
 - Decorator to handle event of connection closing with a client
 ```py
-@server.on_receive
+@server.on_disconnect
 def handle(client: ServerClient):
 	# Handler code here
 ```
@@ -103,9 +105,9 @@ def handle(client: ServerClient):
 > If `data` is not a bytes object it will not be sent
 > 
 > returns `None`
- #### def close()
- - Will disconnect the client from the server and remove all references of the client
- > returns `None`
+#### def close()
+- Will disconnect the client from the server and remove all references of the client
+> returns `None`
 # [textlog.py](pythreadserver/textlog.py)
 - Utility file for logging console to file
 ## class Log(write_to_console: bool, filename: str)
@@ -124,5 +126,4 @@ def handle(client: ServerClient):
 |name|description  |
 |--|--|
 |BUFFER_SIZE | Max number of bytes received each tick  |
-| PORT_C_TO_S | Default port for network path from client to server |
-| PORT_S_TO_C | Default port for network path from server to client |
+| PORT | Default port for sockets |

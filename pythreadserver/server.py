@@ -149,7 +149,7 @@ class Server:
             except KeyboardInterrupt:
                 self.close()
                 break
-            if string.lower() == "exit":
+            if string.lower() in ['stop', 'exit', 'quit']:
                 self.close()
                 break
 

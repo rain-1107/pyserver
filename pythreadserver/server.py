@@ -81,7 +81,7 @@ class Server:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = ""
         self.log.log("Binding sockets to ports...")
-        self.socket.bind((host, PORT))
+        self.socket.bind((host, self.port))
         self.log.log("Done.")
 
     def run(self):
@@ -187,3 +187,4 @@ class Server:
         if func not in self._disconnect_listeners:
             return
         self._disconnect_listeners.remove(func)
+

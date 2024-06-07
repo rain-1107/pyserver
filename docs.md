@@ -6,13 +6,14 @@
 ```py
 console: bool = True  # If true will output log messages to console
 log_path: str = ""  # Path to save log text file. Leave empty for no saving.
+port: int = constants.PORT # Port override (Default is 30000) 
 ```
 ### *Functions*
 #### def connect(ip: str)
 - Attempts connection with server at IP passed in function
 > returns ``0`` if connection is successful
 > 
-> returns ``1``if connection is refused
+> returns ``1`` if connection is refused
 #### def send(data: bytes)
  - Adds ``data`` to the queue
 > ``data`` should be bytes types or it will not be sent
@@ -40,12 +41,12 @@ def handle():
 #### @on_disconnect
 - Decorator to handle disonncetion event from server
 ```py
-@client.on_disonnect
+@client.on_disconnect
 def handle():
 	# Handler code here
 ````
 # [server.py](pythreadserver/server.py)
-## class Server()
+## class Server(**kwargs)
 ### *Parameters*
 ```py
 console: bool = True  # If true will output log messages to console
